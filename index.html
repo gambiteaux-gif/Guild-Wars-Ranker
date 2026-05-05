@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guild Wars Ranking Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Guild Command Center</p>
+        <h1>Guild Wars Ranking System</h1>
+      </div>
+      <button id="resetAllBtn" class="danger-button" type="button">Reset All Data</button>
+    </header>
+
+    <main class="dashboard-grid">
+      <section class="panel war-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">War Dataset</p>
+            <h2>War Control</h2>
+          </div>
+        </div>
+
+        <label for="warSelect">Active War</label>
+        <div class="inline-control">
+          <select id="warSelect"></select>
+          <button id="deleteWarBtn" class="ghost-button" type="button">Delete</button>
+        </div>
+
+        <form id="warForm" class="stacked-form">
+          <label for="warName">War Name</label>
+          <input id="warName" type="text" placeholder="Weekend War #1" required>
+
+          <label for="enemyName">Enemy Team</label>
+          <input id="enemyName" type="text" placeholder="Nightfall Legion" required>
+
+          <label for="warDate">Date</label>
+          <input id="warDate" type="date" required>
+
+          <button class="primary-button" type="submit">Create War</button>
+        </form>
+      </section>
+
+      <section class="panel info-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Current Match</p>
+            <h2 id="activeWarTitle">No War Selected</h2>
+          </div>
+          <span id="activeWarDate" class="date-pill"></span>
+        </div>
+        <p id="activeEnemy" class="enemy-line"></p>
+        <div class="stat-strip">
+          <div>
+            <span id="playerCount">0</span>
+            <small>Players</small>
+          </div>
+          <div>
+            <span id="topScore">0</span>
+            <small>Top Score</small>
+          </div>
+          <div>
+            <span id="averageScore">0</span>
+            <small>Avg Score</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel player-form-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Roster Entry</p>
+            <h2>Add Player Performance</h2>
+          </div>
+        </div>
+
+        <form id="playerForm" class="player-grid">
+          <input type="hidden" id="editingPlayerId">
+
+          <label>
+            Player Name
+            <input id="playerName" type="text" placeholder="Astra" required>
+          </label>
+
+          <label>
+            Role
+            <select id="playerRole">
+              <option>DPS</option>
+              <option>Tank</option>
+              <option>Healer</option>
+              <option>Support</option>
+              <option>Jungler/Roamer</option>
+            </select>
+          </label>
+
+          <label>Kills <input id="kills" type="number" min="0" value="0"></label>
+          <label>Assists <input id="assists" type="number" min="0" value="0"></label>
+          <label>Deaths <input id="deaths" type="number" min="0" value="0"></label>
+          <label>Damage <input id="damage" type="number" min="0" value="0"></label>
+          <label>Tanking <input id="tanking" type="number" min="0" value="0"></label>
+          <label>Healing <input id="healing" type="number" min="0" value="0"></label>
+          <label>Siege Damage <input id="siege" type="number" min="0" value="0"></label>
+          <label>Fun Coins <input id="funCoins" type="number" min="0" value="0"></label>
+
+          <div class="form-actions">
+            <button class="primary-button" type="submit">Save Player</button>
+            <button id="cancelEditBtn" class="ghost-button" type="button">Cancel Edit</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel leaderboard-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Live Rankings</p>
+            <h2>Leaderboard</h2>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Role</th>
+                <th>Stats Summary</th>
+                <th>Total Score</th>
+                <th>Rank</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel config-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Tuning</p>
+            <h2>Role Weights</h2>
+          </div>
+        </div>
+        <div id="weightsConfig" class="config-grid"></div>
+      </section>
+
+      <section class="panel config-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Anime Tier Gates</p>
+            <h2>Rank Thresholds</h2>
+          </div>
+        </div>
+        <div id="thresholdConfig" class="threshold-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="playerModal" class="modal-backdrop" aria-hidden="true">
+    <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalPlayerName">
+      <button id="closeModalBtn" class="close-button" type="button" aria-label="Close player details">x</button>
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Player Analytics</p>
+          <h2 id="modalPlayerName">Player</h2>
+        </div>
+        <span id="modalPlayerRole" class="role-badge"></span>
+      </div>
+
+      <div class="summary-grid">
+        <div><span id="modalAverageRank">-</span><small>Average Rank</small></div>
+        <div><span id="modalMatches">0</span><small>Matches Played</small></div>
+        <div><span id="modalBestWar">-</span><small>Best War</small></div>
+      </div>
+
+      <div class="chart-card">
+        <canvas id="performanceChart" width="900" height="320"></canvas>
+      </div>
+
+      <div class="table-wrap detail-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>War</th>
+              <th>Date</th>
+              <th>Role</th>
+              <th>Stats Breakdown</th>
+              <th>Score</th>
+              <th>Rank</th>
+            </tr>
+          </thead>
+          <tbody id="playerDetailBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
